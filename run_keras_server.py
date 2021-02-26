@@ -9,11 +9,14 @@
 # import the necessary packages
 from keras.applications import ResNet50
 from keras.preprocessing.image import img_to_array
+from keras.models import model_from_json
 from keras.applications import imagenet_utils
 from PIL import Image
 import numpy as np
 import flask
 import io
+from tensorflow.contrib import predictor
+import tensorflow.saved_model
 
 # initialize our Flask application and the Keras model
 app = flask.Flask(__name__)
@@ -24,7 +27,15 @@ def load_model():
 	# pre-trained on ImageNet and provided by Keras, but you can
 	# substitute in your own networks just as easily)
 	global model
-	model = ResNet50(weights="imagenet")
+	# load json and create model
+	json_file = open('model.json', 'r')
+	loaded_model_json = json_file.read()
+	json_file.close()
+	model = model_from_json(loaded_model_json)
+	# load weights into new model
+	model.load_weights("model.h5")
+	print("Loaded model from disk")
+	# model = tf.saved_model.load("../Pose-Verification-Model/model_save/")
 
 def prepare_image(image, target):
 	# if the image mode is not RGB, convert it
