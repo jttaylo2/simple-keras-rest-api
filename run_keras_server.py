@@ -15,7 +15,7 @@ from PIL import Image
 import numpy as np
 import flask
 import io
-from tensorflow.contrib import predictor
+#from tensorflow import predictor
 import tensorflow.saved_model
 
 # initialize our Flask application and the Keras model
@@ -65,18 +65,18 @@ def predict():
 			image = Image.open(io.BytesIO(image))
 
 			# preprocess the image and prepare it for classification
-			image = prepare_image(image, target=(224, 224))
+			image = prepare_image(image, target=(200, 200))
 
 			# classify the input image and then initialize the list
 			# of predictions to return to the client
 			preds = model.predict(image)
-			results = imagenet_utils.decode_predictions(preds)
+			print(preds)
 			data["predictions"] = []
 
 			# loop over the results and add them to the list of
 			# returned predictions
-			for (imagenetID, label, prob) in results[0]:
-				r = {"label": label, "probability": float(prob)}
+			for (prob) in preds:
+				r = {"probability": float(prob)}
 				data["predictions"].append(r)
 
 			# indicate that the request was a success
